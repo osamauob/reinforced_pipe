@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Three‑Layer Glass Fiber Reinforced Pipe — Pmax Calculator (Single and Batch Calculations)</title>
+<style>
+  :root{ --bg:#0f172a; --card:#111827; --muted:#94a3b8; --text:#e5e7eb; --accent:#22c55e; --warn:#f59e0b; --err:#ef4444; }
+  html,body{background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; padding:0;}
+  .wrap{max-width:1180px; margin:32px auto; padding:0 16px;}
+  h1{font-size:1.6rem; margin:0 0 6px;}
+  .byline{margin:0 0 14px; color:#cbd5e1; font-weight:600;}
+  h2{margin:0 0 10px;}
+  .sub{color:var(--muted); margin:0 0 20px; line-height:1.45;}
+  .grid{display:grid; gap:14px; grid-template-columns: repeat(12, 1fr);}  
+  .card{background:var(--card); border-radius:12px; padding:16px;}
+  .col-6{grid-column: span 6;}
+  .col-12{grid-column: span 12;}
+  label{display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px;}
+  .row{display:flex; gap:10px; align-items:center;}
+  input[type="number"], select, textarea{width:100%; padding:10px; border-radius:8px; border:1px solid #374151; background:#0b1220; color:var(--text);}
+  select{max-width:160px;}
+  textarea{min-height:140px; resize:vertical; font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; font-size:.95rem;}
+  .out{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; font-size:1.05rem;}
+  .warn{color:var(--warn);} .err{color:var(--err);} .muted{color:var(--muted);} .accent{color:var(--accent);} 
+  .eq{font-family: Cambria, "Times New Roman", serif; color:#cbd5e1;}
+  button{background:#1f2937; color:#e5e7eb; border:1px solid #334155; padding:10px 14px; border-radius:10px; cursor:pointer;}
+  button:hover{background:#111827;}
+  .btnrow{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+  table{width:100%; border-collapse:collapse; margin-top:10px;}
+  th,td{border:1px solid #334155; padding:8px; text-align:right; white-space:nowrap;}
+  th{background:#0b1220; color:#cbd5e1; position:sticky; top:0;}
+  td:first-child, th:first-child{text-align:left; white-space:normal;}
+  .scroll{overflow:auto; max-height:380px; border:1px solid #334155; border-radius:10px;}
+  .tag{display:inline-block; padding:2px 8px; border-radius:999px; background:#0b1220; border:1px solid #334155; color:var(--muted); font-size:.8rem;}
+  .hint{color:var(--muted); font-size:.85rem; margin-top:6px;}
+  code{background:#0b1220; padding:2px 6px; border-radius:6px; border:1px solid #334155;}
+
+  /* Illustration box */
+  figure{margin:0;}
+  .figurebox img{max-width:100%; height:auto; display:block; margin:8px auto 0; background:#ffffff; border-radius:10px; padding:10px;}
+  .figurebox figcaption{margin-top:10px; color:#cbd5e1; font-size:.95rem;}
+  .figurebox a{color:#93c5fd; text-decoration:none;}
+  .figurebox a:hover{text-decoration:underline;}
+
+  @media (max-width: 860px){ .col-6{grid-column: span 12;} select{max-width:140px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Three‑Layer Glass Fiber Reinforced Pipe — <span class="accent">P<sub>max</sub></span> Calculator <span class="muted">(Single and Batch Calculations)</span></h1>
+  <p class="byline">Calculator Designed by Osama Marzouk, College of Engineering, University of Buraimi (UoB)</p>
+
+  <p class="sub">
+    Equation: <span class="eq">P<sub>max</sub> = (2 t<sub>2</sub> / D) · [ (V<sub>f</sub> σ<sub>f</sub> cos²θ + V<sub>m</sub> σ<sub>m</sub>) / FS ]</span>, where <span class="eq">V<sub>m</sub> = 1 − V<sub>f</sub></span>.
+    <span class="tag">t<sub>2</sub> in mm; D in mm or inch; σ in MPa or psi; θ in degrees</span>
+  </p>
+
+  <div class="grid">
+
+    <!-- Illustration / Credit -->
+    <div class="card col-12 figurebox">
+      <h2 style="margin-top:0">Pipe layer illustration</h2>
+      <figure>
+        <img src="https://cpioman.com/wp-content/uploads/2020/12/liner.png" alt="Pipe liner illustration (liner layer)" loading="lazy" />
+        <figcaption>
+          Caption: Example schematic of the <em>liner layer</em> in a composite pipe wall.
+          <div class="hint" style="margin-top:6px">
+            Image credit: <a href="https://cpioman.com/" target="_blank" rel="noopener">Composite Pipes Industry (CPI) Company</a>.
+            Image link: <a href="https://cpioman.com/wp-content/uploads/2020/12/liner.png" target="_blank" rel="noopener">https://cpioman.com/wp-content/uploads/2020/12/liner.png</a>
+          </div>
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- SINGLE SCENARIO INPUTS -->
+    <div class="card col-6">
+      <h2>Single scenario</h2>
+
+      <label><strong>Structural laminate thickness</strong> (t<sub>2</sub>)</label>
+      <div class="row">
+        <input id="t2" type="number" step="any" value="3" />
+        <div class="tag">mm</div>
+      </div>
+
+      <label style="margin-top:12px"><strong>Mean diameter</strong> (D)</label>
+      <div class="row">
+        <input id="D" type="number" step="any" value="200" />
+        <select id="DUnit">
+          <option value="mm" selected>mm</option>
+          <option value="in">inch</option>
+        </select>
+      </div>
+      <div id="D_oth" class="hint">Equivalent: —</div>
+
+      <label style="margin-top:12px"><strong>Fiber volume fraction</strong> (V<sub>f</sub>)</label>
+      <div class="row">
+        <input id="Vf" type="number" step="any" value="0.75" min="0" max="1" />
+        <div class="tag">0–1</div>
+      </div>
+
+      <label style="margin-top:12px"><strong>Fiber tensile strength</strong> (σ<sub>f</sub>)</label>
+      <div class="row">
+        <input id="sf" type="number" step="any" value="3000" />
+        <select id="sfUnit">
+          <option value="MPa" selected>MPa</option>
+          <option value="psi">psi</option>
+        </select>
+      </div>
+      <div id="sf_oth" class="hint">Equivalent: —</div>
+
+      <label style="margin-top:12px"><strong>Matrix tensile strength</strong> (σ<sub>m</sub>)</label>
+      <div class="row">
+        <input id="sm" type="number" step="any" value="50" />
+        <select id="smUnit">
+          <option value="MPa" selected>MPa</option>
+          <option value="psi">psi</option>
+        </select>
+      </div>
+      <div id="sm_oth" class="hint">Equivalent: —</div>
+
+      <label style="margin-top:12px"><strong>Safety factor</strong> (FS)</label>
+      <div class="row">
+        <input id="FS" type="number" step="any" value="3" min="0.1" />
+        <div class="tag">—</div>
+      </div>
+
+      <label style="margin-top:12px"><strong>Winding angle from the axial direction</strong> (θ)</label>
+      <div class="row">
+        <input id="theta" type="number" step="any" value="54" />
+        <div class="tag">deg</div>
+      </div>
+
+      <div class="btnrow">
+        <button id="resetBtn" type="button">Reset defaults</button>
+      </div>
+      <p id="msg" class="muted" style="margin:10px 0 0"></p>
+    </div>
+
+    <!-- SINGLE SCENARIO RESULTS -->
+    <div class="card col-6">
+      <h2>Single scenario results</h2>
+      <div class="out">
+        <div><strong>P<sub>max</sub></strong> = <span id="pmpa">—</span> MPa  <span class="muted">(<span id="ppsi">—</span> psi)</span></div>
+        <hr style="border:0;border-top:1px solid #334155;margin:12px 0" />
+        <div>cos²θ = <span id="cos2">—</span></div>
+        <div>V<sub>m</sub> = 1 − V<sub>f</sub> = <span id="Vm">—</span></div>
+        <div>Laminate term = <span id="lamTerm">—</span> MPa</div>
+        <div>Geometry factor (2 t<sub>2</sub> / D) = <span id="geom">—</span></div>
+        <div class="hint" style="margin-top:10px">Internally, D is converted to mm and σ to MPa for the calculation.</div>
+      </div>
+      <div id="warnings" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- BATCH INPUT -->
+    <div class="card col-12">
+      <h2>Batch scenarios</h2>
+      <p class="muted" style="margin-top:0">
+        Paste one scenario per line using <strong>CSV</strong> in the order:
+        <span class="eq">name, t2, D, Vf, sigma_f, sigma_m, FS, theta</span>.
+        Choose the units used for <strong>D</strong> and <strong>σ</strong> below (applies to all batch lines). Lines starting with <code>#</code> are ignored.
+      </p>
+
+      <div class="row" style="gap:14px; flex-wrap:wrap;">
+        <div style="min-width:260px; flex:1;">
+          <label><strong>Batch diameter unit</strong> (D)</label>
+          <select id="batchDUnit">
+            <option value="mm" selected>mm</option>
+            <option value="in">inch</option>
+          </select>
+        </div>
+        <div style="min-width:260px; flex:1;">
+          <label><strong>Batch stress unit</strong> (σ<sub>f</sub>, σ<sub>m</sub>)</label>
+          <select id="batchSUnit">
+            <option value="MPa" selected>MPa</option>
+            <option value="psi">psi</option>
+          </select>
+        </div>
+      </div>
+
+      <label style="margin-top:12px"><strong>Batch input</strong> (CSV lines)</label>
+      <textarea id="batch" spellcheck="false"># name, t2(mm), D(unit), Vf, sigma_f(unit), sigma_m(unit), FS, theta(deg)
+Base case, 3, 200, 0.75, 3000, 50, 3, 54
+Scenario A, 4, 250, 0.70, 2800, 50, 3, 54
+Scenario B, 3, 150, 0.75, 3000, 60, 2.5, 55</textarea>
+
+      <div class="btnrow">
+        <button id="runBatchBtn" type="button">Compute batch</button>
+        <button id="saveExcelBtn" type="button">Save inputs & outputs to Excel (.xlsx)</button>
+        <button id="fillFromSingleBtn" type="button">Add current single scenario to batch</button>
+      </div>
+
+      <div id="batchMsg" class="muted" style="margin-top:10px;"></div>
+      <div id="batchWarn" style="margin-top:10px;"></div>
+
+      <div class="scroll" style="margin-top:10px;">
+        <table id="batchTable">
+          <thead>
+            <tr>
+              <th>Scenario</th>
+              <th>t2 (mm)</th>
+              <th>D (entered)</th>
+              <th>σf (entered)</th>
+              <th>σm (entered)</th>
+              <th>Vf</th>
+              <th>FS</th>
+              <th>θ (deg)</th>
+              <th>Pmax (MPa)</th>
+              <th>Pmax (psi)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint" style="margin-top:8px;">Cells show both units, e.g., “200 mm (7.874 in)” or “3000 MPa (435113 psi)”.</div>
+    </div>
+
+    <div class="card col-12">
+      <h3 style="margin-top:0">Notes</h3>
+      <ul>
+        <li><strong>Excel export:</strong> the Batch sheet in the exported .xlsx does <strong>not</strong> include a “notes” column.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const IN_TO_MM = 25.4;
+  const MPa_TO_PSI = 145.03773773020923;
+  const PSI_TO_MPA = 1 / MPa_TO_PSI;
+
+  const els = {
+    t2: document.getElementById('t2'),
+    D: document.getElementById('D'),
+    DUnit: document.getElementById('DUnit'),
+    D_oth: document.getElementById('D_oth'),
+    Vf: document.getElementById('Vf'),
+    sf: document.getElementById('sf'),
+    sfUnit: document.getElementById('sfUnit'),
+    sf_oth: document.getElementById('sf_oth'),
+    sm: document.getElementById('sm'),
+    smUnit: document.getElementById('smUnit'),
+    sm_oth: document.getElementById('sm_oth'),
+    FS: document.getElementById('FS'),
+    theta: document.getElementById('theta'),
+
+    pmpa: document.getElementById('pmpa'),
+    ppsi: document.getElementById('ppsi'),
+    cos2: document.getElementById('cos2'),
+    Vm: document.getElementById('Vm'),
+    lamTerm: document.getElementById('lamTerm'),
+    geom: document.getElementById('geom'),
+    warnings: document.getElementById('warnings'),
+
+    resetBtn: document.getElementById('resetBtn'),
+    saveExcelBtn: document.getElementById('saveExcelBtn'),
+    msg: document.getElementById('msg'),
+
+    batch: document.getElementById('batch'),
+    batchDUnit: document.getElementById('batchDUnit'),
+    batchSUnit: document.getElementById('batchSUnit'),
+    runBatchBtn: document.getElementById('runBatchBtn'),
+    fillFromSingleBtn: document.getElementById('fillFromSingleBtn'),
+    batchTableBody: document.getElementById('batchTable').querySelector('tbody'),
+    batchMsg: document.getElementById('batchMsg'),
+    batchWarn: document.getElementById('batchWarn'),
+  };
+
+  function fmtDisplay(x, digits=6){
+    if(!isFinite(x)) return '—';
+    const abs = Math.abs(x);
+    if(abs===0) return '0';
+    if(abs>=1e6 || abs<0.001) return x.toExponential(3);
+    return Number(x.toPrecision(digits)).toString();
+  }
+
+  function D_to_mm(Dval, unit){
+    if(!isFinite(Dval)) return NaN;
+    return unit === 'in' ? Dval * IN_TO_MM : Dval;
+  }
+  function mm_to_in(mm){ return mm / IN_TO_MM; }
+  function stress_to_MPa(val, unit){
+    if(!isFinite(val)) return NaN;
+    return unit === 'psi' ? val * PSI_TO_MPA : val;
+  }
+  function MPa_to_psi(mpa){ return mpa * MPa_TO_PSI; }
+
+  function updateEquivalents(){
+    const Dv = parseFloat(els.D.value);
+    const Du = els.DUnit.value;
+    if(isFinite(Dv)){
+      const Dmm = D_to_mm(Dv, Du);
+      els.D_oth.textContent = (Du === 'mm') ? `Equivalent: ${fmtDisplay(mm_to_in(Dmm), 6)} inch` : `Equivalent: ${fmtDisplay(Dmm, 6)} mm`;
+    } else els.D_oth.textContent = 'Equivalent: —';
+
+    const sfv = parseFloat(els.sf.value);
+    const sfu = els.sfUnit.value;
+    if(isFinite(sfv)){
+      const sfMPa = stress_to_MPa(sfv, sfu);
+      els.sf_oth.textContent = (sfu === 'MPa') ? `Equivalent: ${fmtDisplay(MPa_to_psi(sfMPa), 6)} psi` : `Equivalent: ${fmtDisplay(sfMPa, 6)} MPa`;
+    } else els.sf_oth.textContent = 'Equivalent: —';
+
+    const smv = parseFloat(els.sm.value);
+    const smu = els.smUnit.value;
+    if(isFinite(smv)){
+      const smMPa = stress_to_MPa(smv, smu);
+      els.sm_oth.textContent = (smu === 'MPa') ? `Equivalent: ${fmtDisplay(MPa_to_psi(smMPa), 6)} psi` : `Equivalent: ${fmtDisplay(smMPa, 6)} MPa`;
+    } else els.sm_oth.textContent = 'Equivalent: —';
+  }
+
+  function computePmaxCore({t2_mm, D_mm, Vf, sf_MPa, sm_MPa, FS, theta_deg}){
+    const warnings = [];
+    const errors = [];
+    if(!(t2_mm>0)) errors.push('t2 must be > 0');
+    if(!(D_mm>0)) errors.push('D must be > 0');
+    if(!(sf_MPa>0)) errors.push('sigma_f must be > 0');
+    if(!(sm_MPa>0)) errors.push('sigma_m must be > 0');
+    if(!(FS>0)) errors.push('FS must be > 0');
+    if(!isFinite(theta_deg)) errors.push('theta must be numeric');
+
+    let Vf_used = Vf;
+    if(!(Vf>=0 && Vf<=1)){
+      warnings.push('Vf outside [0,1] (clamped)');
+      Vf_used = Math.max(0, Math.min(1, Vf));
+    }
+    const Vm = 1 - Vf_used;
+    const cos2 = Math.cos(theta_deg * Math.PI/180) ** 2;
+    const laminate_MPa = (Vf_used * sf_MPa * cos2) + (Vm * sm_MPa);
+    const geom = 2 * t2_mm / D_mm;
+    let P_MPa = NaN;
+    if(errors.length===0) P_MPa = geom * (laminate_MPa / FS);
+    return {P_MPa, P_psi: MPa_to_psi(P_MPa), cos2, Vm, laminate_MPa, geom, warnings, errors};
+  }
+
+  function calcSingle(){
+    updateEquivalents();
+    const t2 = parseFloat(els.t2.value);
+    const Dv = parseFloat(els.D.value);
+    const Du = els.DUnit.value;
+    const Dmm = D_to_mm(Dv, Du);
+    const Vf = parseFloat(els.Vf.value);
+    const sfv = parseFloat(els.sf.value);
+    const sfu = els.sfUnit.value;
+    const sfMPa = stress_to_MPa(sfv, sfu);
+    const smv = parseFloat(els.sm.value);
+    const smu = els.smUnit.value;
+    const smMPa = stress_to_MPa(smv, smu);
+    const FS = parseFloat(els.FS.value);
+    const theta = parseFloat(els.theta.value);
+
+    const r = computePmaxCore({t2_mm:t2, D_mm:Dmm, Vf, sf_MPa:sfMPa, sm_MPa:smMPa, FS, theta_deg:theta});
+
+    els.pmpa.textContent = fmtDisplay(r.P_MPa, 6);
+    els.ppsi.textContent = fmtDisplay(r.P_psi, 6);
+    els.cos2.textContent = fmtDisplay(r.cos2, 6);
+    els.Vm.textContent = fmtDisplay(r.Vm, 6);
+    els.lamTerm.textContent = fmtDisplay(r.laminate_MPa, 6);
+    els.geom.textContent = fmtDisplay(r.geom, 6);
+
+    els.warnings.innerHTML = '';
+    if(r.errors.length) els.warnings.innerHTML += `<p class="err"><strong>Errors:</strong> ${r.errors.join('; ')}</p>`;
+    if(r.warnings.length) els.warnings.innerHTML += `<p class="warn"><strong>Warnings:</strong> ${r.warnings.join('; ')}</p>`;
+
+    return {
+      entered: {t2_mm:t2, D_value:Dv, D_unit:Du, Vf, sf_value:sfv, sf_unit:sfu, sm_value:smv, sm_unit:smu, FS, theta_deg:theta},
+      base: {D_mm:Dmm, sf_MPa:sfMPa, sm_MPa:smMPa},
+      out: r
+    };
+  }
+
+  function resetDefaults(){
+    els.t2.value = 3;
+    els.D.value = 200;
+    els.DUnit.value = 'mm';
+    els.Vf.value = 0.75;
+    els.sf.value = 3000;
+    els.sfUnit.value = 'MPa';
+    els.sm.value = 50;
+    els.smUnit.value = 'MPa';
+    els.FS.value = 3;
+    els.theta.value = 54;
+    els.msg.textContent = 'Defaults restored.';
+    calcSingle();
+    runBatch();
+  }
+
+  let lastBatchRows = [];
+
+  function parseCSVLine(line){
+    const out = [];
+    let cur = '';
+    let inQuotes = false;
+    for(let i=0;i<line.length;i++){
+      const ch = line[i];
+      if(ch==='"'){
+        if(inQuotes && line[i+1]==='"'){ cur+='"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if(ch===',' && !inQuotes){ out.push(cur.trim()); cur=''; }
+      else cur += ch;
+    }
+    out.push(cur.trim());
+    return out;
+  }
+
+  function runBatch(){
+    const Dunit = els.batchDUnit.value;
+    const Sunit = els.batchSUnit.value;
+    const lines = (els.batch.value || '').split(/\r?\n/);
+    const rows = [];
+    const warns = [];
+
+    lines.forEach((raw, idx)=>{
+      const line = raw.trim();
+      if(!line || line.startsWith('#')) return;
+      const parts = parseCSVLine(line);
+      if(parts.length < 8){ warns.push(`Line ${idx+1}: expected 8 fields but got ${parts.length}. Skipped.`); return; }
+      const name = parts[0] || `Scenario ${rows.length+1}`;
+      const t2 = parseFloat(parts[1]);
+      const Dv = parseFloat(parts[2]);
+      const Vf = parseFloat(parts[3]);
+      const sfv = parseFloat(parts[4]);
+      const smv = parseFloat(parts[5]);
+      const FS = parseFloat(parts[6]);
+      const theta = parseFloat(parts[7]);
+
+      const Dmm = D_to_mm(Dv, Dunit);
+      const sfMPa = stress_to_MPa(sfv, Sunit);
+      const smMPa = stress_to_MPa(smv, Sunit);
+
+      const r = computePmaxCore({t2_mm:t2, D_mm:Dmm, Vf, sf_MPa:sfMPa, sm_MPa:smMPa, FS, theta_deg:theta});
+
+      rows.push({
+        name,
+        t2_mm:t2,
+        D_value:Dv, D_unit:Dunit, D_mm:Dmm,
+        sf_value:sfv, sm_value:smv, s_unit:Sunit, sf_MPa:sfMPa, sm_MPa:smMPa,
+        Vf, FS, theta_deg:theta,
+        P_MPa:r.P_MPa, P_psi:r.P_psi,
+        _errors:r.errors, _warnings:r.warnings
+      });
+    });
+
+    els.batchTableBody.innerHTML = '';
+    rows.forEach(row=>{
+      const tr = document.createElement('tr');
+      const hasErr = row._errors && row._errors.length;
+      if(hasErr) tr.style.background = 'rgba(239,68,68,0.12)';
+
+      const D_other = row.D_unit==='mm' ? `${fmtDisplay(mm_to_in(row.D_mm),6)} in` : `${fmtDisplay(row.D_mm,6)} mm`;
+      const D_cell = `${fmtDisplay(row.D_value,6)} ${row.D_unit} (${D_other})`;
+
+      const sf_other = row.s_unit==='MPa' ? `${fmtDisplay(MPa_to_psi(row.sf_MPa),6)} psi` : `${fmtDisplay(row.sf_MPa,6)} MPa`;
+      const sm_other = row.s_unit==='MPa' ? `${fmtDisplay(MPa_to_psi(row.sm_MPa),6)} psi` : `${fmtDisplay(row.sm_MPa,6)} MPa`;
+      const sf_cell = `${fmtDisplay(row.sf_value,6)} ${row.s_unit} (${sf_other})`;
+      const sm_cell = `${fmtDisplay(row.sm_value,6)} ${row.s_unit} (${sm_other})`;
+
+      const cells = [row.name, fmtDisplay(row.t2_mm,6), D_cell, sf_cell, sm_cell, fmtDisplay(row.Vf,6), fmtDisplay(row.FS,6), fmtDisplay(row.theta_deg,6), fmtDisplay(row.P_MPa,6), fmtDisplay(row.P_psi,6)];
+      cells.forEach((c,i)=>{
+        const td = document.createElement('td');
+        td.textContent = c;
+        if(i===0) td.style.textAlign='left';
+        tr.appendChild(td);
+      });
+      els.batchTableBody.appendChild(tr);
+    });
+
+    lastBatchRows = rows;
+    els.batchMsg.textContent = rows.length ? `Computed ${rows.length} scenario(s).` : 'No valid scenarios found.';
+
+    els.batchWarn.innerHTML = '';
+    const parsing = warns.length ? `<p class="warn"><strong>Parsing warnings:</strong><br>${warns.map(w=>w.replaceAll('<','&lt;')).join('<br>')}</p>` : '';
+    const calcNotes = rows
+      .filter(r => (r._errors && r._errors.length) || (r._warnings && r._warnings.length))
+      .slice(0, 8)
+      .map(r => {
+        const e = (r._errors||[]).join('; ');
+        const w = (r._warnings||[]).join('; ');
+        return `<div><strong>${r.name}:</strong> ${e ? `<span class="err">${e}</span>` : ''}${(e&&w)?' — ':''}${w ? `<span class="warn">${w}</span>` : ''}</div>`;
+      }).join('');
+    const calcBlock = calcNotes ? `<p class="muted"><strong>Scenario notes (first 8):</strong></p>${calcNotes}` : '';
+    els.batchWarn.innerHTML = parsing + calcBlock;
+  }
+
+  function addSingleToBatch(){
+    const name = `Single @ ${new Date().toLocaleString()}`;
+    const line = [name, els.t2.value, els.D.value, els.Vf.value, els.sf.value, els.sm.value, els.FS.value, els.theta.value].join(', ');
+    els.batch.value = (els.batch.value.trimEnd() + '\n' + line + '\n');
+    els.batchMsg.textContent = 'Added current single scenario to batch.';
+  }
+
+  // XLSX helpers (no notes column in Batch sheet)
+  function xmlEscapeX(s){
+    return String(s ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&apos;');
+  }
+
+  function colNameX(n){
+    let s = '';
+    while(n > 0){
+      const m = (n - 1) % 26;
+      s = String.fromCharCode(65 + m) + s;
+      n = Math.floor((n - 1) / 26);
+    }
+    return s;
+  }
+
+  function sheetXmlX(rows){
+    let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+    xml += '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">';
+    xml += '<sheetData>';
+    for(let r=0; r<rows.length; r++){
+      const row = rows[r];
+      const rIdx = r + 1;
+      xml += `<row r="${rIdx}">`;
+      for(let c=0; c<row.length; c++){
+        const cRef = colNameX(c+1) + rIdx;
+        const cell = row[c];
+        if(!cell){ xml += `<c r="${cRef}"/>`; continue; }
+        if(cell.t === 'n'){
+          const num = (cell.v === '' || cell.v === null || cell.v === undefined || !isFinite(cell.v)) ? '' : String(cell.v);
+          xml += num === '' ? `<c r="${cRef}"/>` : `<c r="${cRef}"><v>${xmlEscapeX(num)}</v></c>`;
+        } else {
+          const str = (cell.v === null || cell.v === undefined) ? '' : String(cell.v);
+          xml += `<c r="${cRef}" t="inlineStr"><is><t>${xmlEscapeX(str)}</t></is></c>`;
+        }
+      }
+      xml += '</row>';
+    }
+    xml += '</sheetData></worksheet>';
+    return xml;
+  }
+
+  function utf8BytesX(str){ return new TextEncoder().encode(str); }
+
+  const CRC_TABLE_X = (function(){
+    const table = new Uint32Array(256);
+    for(let i=0;i<256;i++){
+      let c = i;
+      for(let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      table[i] = c >>> 0;
+    }
+    return table;
+  })();
+
+  function crc32X(buf){
+    let c = 0xFFFFFFFF;
+    for(let i=0;i<buf.length;i++) c = CRC_TABLE_X[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function u16X(n){ return new Uint8Array([n & 0xFF, (n >>> 8) & 0xFF]); }
+  function u32X(n){ return new Uint8Array([n & 0xFF, (n >>> 8) & 0xFF, (n >>> 16) & 0xFF, (n >>> 24) & 0xFF]); }
+
+  function concatArraysX(arrays){
+    let total = 0;
+    arrays.forEach(a => total += a.length);
+    const out = new Uint8Array(total);
+    let offset = 0;
+    arrays.forEach(a => { out.set(a, offset); offset += a.length; });
+    return out;
+  }
+
+  function zipStoreX(files){
+    const localParts = [];
+    const centralParts = [];
+    let offset = 0;
+    files.forEach(f => {
+      const nameBytes = utf8BytesX(f.name);
+      const data = f.dataBytes;
+      const crc = crc32X(data);
+      const size = data.length;
+      const localHeader = concatArraysX([
+        u32X(0x04034b50), u16X(20), u16X(0), u16X(0), u16X(0), u16X(0),
+        u32X(crc), u32X(size), u32X(size), u16X(nameBytes.length), u16X(0), nameBytes
+      ]);
+      localParts.push(localHeader, data);
+      const centralHeader = concatArraysX([
+        u32X(0x02014b50), u16X(20), u16X(20), u16X(0), u16X(0), u16X(0), u16X(0),
+        u32X(crc), u32X(size), u32X(size), u16X(nameBytes.length), u16X(0), u16X(0), u16X(0), u16X(0),
+        u32X(0), u32X(offset), nameBytes
+      ]);
+      centralParts.push(centralHeader);
+      offset += localHeader.length + data.length;
+    });
+    const centralStart = offset;
+    const centralData = concatArraysX(centralParts);
+    const end = concatArraysX([
+      u32X(0x06054b50), u16X(0), u16X(0), u16X(files.length), u16X(files.length), u32X(centralData.length), u32X(centralStart), u16X(0)
+    ]);
+    return concatArraysX([...localParts, centralData, end]);
+  }
+
+  function buildXlsx(singleRows, batchRows){
+    const sheet1 = sheetXmlX(singleRows);
+    const sheet2 = sheetXmlX(batchRows);
+
+    const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Single" sheetId="1" r:id="rId1"/>
+    <sheet name="Batch" sheetId="2" r:id="rId2"/>
+  </sheets>
+</workbook>`;
+
+    const workbookRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+</Relationships>`;
+
+    const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+
+    const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>`;
+
+    const files = [
+      {name: '[Content_Types].xml', dataBytes: utf8BytesX(contentTypes)},
+      {name: '_rels/.rels', dataBytes: utf8BytesX(rootRels)},
+      {name: 'xl/workbook.xml', dataBytes: utf8BytesX(workbookXml)},
+      {name: 'xl/_rels/workbook.xml.rels', dataBytes: utf8BytesX(workbookRels)},
+      {name: 'xl/worksheets/sheet1.xml', dataBytes: utf8BytesX(sheet1)},
+      {name: 'xl/worksheets/sheet2.xml', dataBytes: utf8BytesX(sheet2)},
+    ];
+
+    return zipStoreX(files);
+  }
+
+  function saveToExcelXlsx(){
+    const single = calcSingle();
+    runBatch();
+
+    const now = new Date();
+    const ts = now.toISOString().replaceAll(':','-').split('.')[0];
+
+    const sE = single.entered;
+    const sB = single.base;
+    const sO = single.out;
+
+    const D_other_val = (sE.D_unit === 'mm') ? mm_to_in(sB.D_mm) : sB.D_mm;
+    const D_other_unit = (sE.D_unit === 'mm') ? 'inch' : 'mm';
+
+    const sf_other_val = (sE.sf_unit === 'MPa') ? MPa_to_psi(sB.sf_MPa) : sB.sf_MPa;
+    const sf_other_unit = (sE.sf_unit === 'MPa') ? 'psi' : 'MPa';
+
+    const sm_other_val = (sE.sm_unit === 'MPa') ? MPa_to_psi(sB.sm_MPa) : sB.sm_MPa;
+    const sm_other_unit = (sE.sm_unit === 'MPa') ? 'psi' : 'MPa';
+
+    const singleRows = [
+      [{t:'s', v:'Field'}, {t:'s', v:'Entered value'}, {t:'s', v:'Entered unit'}, {t:'s', v:'Converted value'}, {t:'s', v:'Converted unit'}],
+      [{t:'s', v:'t2 (Structural laminate thickness)'}, {t:'n', v:sE.t2_mm}, {t:'s', v:'mm'}, {t:'n', v:sE.t2_mm}, {t:'s', v:'mm'}],
+      [{t:'s', v:'D (Mean diameter)'}, {t:'n', v:sE.D_value}, {t:'s', v:sE.D_unit}, {t:'n', v:D_other_val}, {t:'s', v:D_other_unit}],
+      [{t:'s', v:'Vf (Fiber volume fraction)'}, {t:'n', v:sE.Vf}, {t:'s', v:'—'}, {t:'n', v:sE.Vf}, {t:'s', v:'—'}],
+      [{t:'s', v:'sigma_f (Fiber tensile strength)'}, {t:'n', v:sE.sf_value}, {t:'s', v:sE.sf_unit}, {t:'n', v:sf_other_val}, {t:'s', v:sf_other_unit}],
+      [{t:'s', v:'sigma_m (Matrix tensile strength)'}, {t:'n', v:sE.sm_value}, {t:'s', v:sE.sm_unit}, {t:'n', v:sm_other_val}, {t:'s', v:sm_other_unit}],
+      [{t:'s', v:'FS (Safety factor)'}, {t:'n', v:sE.FS}, {t:'s', v:'—'}, {t:'n', v:sE.FS}, {t:'s', v:'—'}],
+      [{t:'s', v:'theta (Winding angle from axial direction)'}, {t:'n', v:sE.theta_deg}, {t:'s', v:'deg'}, {t:'n', v:sE.theta_deg}, {t:'s', v:'deg'}],
+      [],
+      [{t:'s', v:'Output'}, {t:'s', v:'Value'}, {t:'s', v:'Unit'}, {t:'s', v:''}, {t:'s', v:''}],
+      [{t:'s', v:'Pmax'}, {t:'n', v:isFinite(sO.P_MPa)? sO.P_MPa : ''}, {t:'s', v:'MPa'}, {t:'s', v:''}, {t:'s', v:''}],
+      [{t:'s', v:'Pmax'}, {t:'n', v:isFinite(sO.P_psi)? sO.P_psi : ''}, {t:'s', v:'psi'}, {t:'s', v:''}, {t:'s', v:''}],
+    ];
+
+    // Batch sheet header WITHOUT notes
+    const header = [
+      {t:'s', v:'Scenario'}, {t:'s', v:'t2_mm'},
+      {t:'s', v:'D_entered'}, {t:'s', v:'D_unit'}, {t:'s', v:'D_converted'}, {t:'s', v:'D_converted_unit'},
+      {t:'s', v:'sigma_f_entered'}, {t:'s', v:'sigma_f_unit'}, {t:'s', v:'sigma_f_converted'}, {t:'s', v:'sigma_f_converted_unit'},
+      {t:'s', v:'sigma_m_entered'}, {t:'s', v:'sigma_m_unit'}, {t:'s', v:'sigma_m_converted'}, {t:'s', v:'sigma_m_converted_unit'},
+      {t:'s', v:'Vf'}, {t:'s', v:'FS'}, {t:'s', v:'theta_deg'},
+      {t:'s', v:'Pmax_MPa'}, {t:'s', v:'Pmax_psi'}
+    ];
+
+    const batchRows = [header];
+
+    lastBatchRows.forEach(r => {
+      const D_conv_val = (r.D_unit === 'mm') ? mm_to_in(r.D_mm) : r.D_mm;
+      const D_conv_unit = (r.D_unit === 'mm') ? 'inch' : 'mm';
+
+      const sf_conv_val = (r.s_unit === 'MPa') ? MPa_to_psi(r.sf_MPa) : r.sf_MPa;
+      const sf_conv_unit = (r.s_unit === 'MPa') ? 'psi' : 'MPa';
+
+      const sm_conv_val = (r.s_unit === 'MPa') ? MPa_to_psi(r.sm_MPa) : r.sm_MPa;
+      const sm_conv_unit = (r.s_unit === 'MPa') ? 'psi' : 'MPa';
+
+      batchRows.push([
+        {t:'s', v:r.name}, {t:'n', v:r.t2_mm},
+        {t:'n', v:r.D_value}, {t:'s', v:r.D_unit}, {t:'n', v:D_conv_val}, {t:'s', v:D_conv_unit},
+        {t:'n', v:r.sf_value}, {t:'s', v:r.s_unit}, {t:'n', v:sf_conv_val}, {t:'s', v:sf_conv_unit},
+        {t:'n', v:r.sm_value}, {t:'s', v:r.s_unit}, {t:'n', v:sm_conv_val}, {t:'s', v:sm_conv_unit},
+        {t:'n', v:r.Vf}, {t:'n', v:r.FS}, {t:'n', v:r.theta_deg},
+        {t:'n', v:isFinite(r.P_MPa)? r.P_MPa : ''},
+        {t:'n', v:isFinite(r.P_psi)? r.P_psi : ''}
+      ]);
+    });
+
+    const xlsxBytes = buildXlsx(singleRows, batchRows);
+    const blob = new Blob([xlsxBytes], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `gfrp_pmax_inputs_outputs_${ts}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    els.msg.textContent = 'Excel file saved (includes Single and Batch sheets).';
+  }
+
+  // Event wiring
+  ['input','change'].forEach(evt=>{
+    [els.t2, els.D, els.DUnit, els.Vf, els.sf, els.sfUnit, els.sm, els.smUnit, els.FS, els.theta]
+      .forEach(el => el.addEventListener(evt, ()=>{ calcSingle(); }));
+  });
+
+  els.resetBtn.addEventListener('click', resetDefaults);
+  els.saveExcelBtn.addEventListener('click', saveToExcelXlsx);
+
+  els.runBatchBtn.addEventListener('click', runBatch);
+  els.fillFromSingleBtn.addEventListener('click', addSingleToBatch);
+  els.batchDUnit.addEventListener('change', runBatch);
+  els.batchSUnit.addEventListener('change', runBatch);
+
+  // Init
+  calcSingle();
+  runBatch();
+})();
+</script>
+</body>
+</html>
